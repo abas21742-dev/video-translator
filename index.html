@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="utf-8">
+
+<meta name="viewport"
+      content="width=device-width,initial-scale=1">
+
+<title>مترجم الفيديو العربي</title>
+
+<style>
+
+:root{
+  --bg:#14161a;
+  --card:#1e2228;
+  --line:#333a44;
+  --acc:#f5a623;
+  --tx:#e8eaed;
+  --mu:#9aa3ad;
+  --danger:#ff5555;
+  --ok:#43d17a;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--tx);
+  font-family:Tahoma,Arial,sans-serif;
+  padding:16px;
+  max-width:720px;
+  margin-inline:auto;
+}
+
+h1{
+  color:var(--acc);
+  font-size:22px;
+  border-bottom:3px solid var(--acc);
+  padding-bottom:8px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+label{
+  display:block;
+  color:var(--mu);
+  font-size:13px;
+  margin:10px 0 4px;
+}
+
+input[type=url],
+select{
+  width:100%;
+  padding:10px;
+  background:#0f1114;
+  border:1px solid var(--line);
+  border-radius:6px;
+  color:var(--tx);
+  font-size:15px;
+}
+
+input[type=file]{
+  width:100%;
+  color:var(--mu);
+  padding:8px 0;
+}
+
+button{
+  background:var(--acc);
+  color:#111;
+  border:0;
+  border-radius:6px;
+  padding:11px 16px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:12px;
+  width:100%;
+}
+
+button.sec{
+  background:#2b323b;
+  color:var(--tx);
+  border:1px solid var(--line);
+}
+
+button:disabled{
+  opacity:.5;
+}
+
+#st{
+  margin-top:10px;
+  color:var(--acc);
+  font-size:14px;
+  min-height:20px;
+  line-height:1.6;
+}
+
+.vw{
+  position:relative;
+  background:#000;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+video{
+  width:100%;
+  display:block;
+  background:#000;
+}
+
+#ytbox{
+  width:100%;
+  aspect-ratio:16/9;
+  display:none;
+  background:#000;
+}
+
+#ytbox iframe{
+  width:100%;
+  height:100%;
+  display:block;
+  border:0;
+}
+
+#sub{
+  position:absolute;
+  bottom:48px;
+  left:8px;
+  right:8px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  color:#fff;
+  text-shadow:
+    0 0 4px #000,
+    0 0 4px #000,
+    0 0 6px #000;
+  pointer-events:none;
+  z-index:10;
+  line-height:1.5;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+}
+
+.tabs button{
+  margin:0;
+  background:#2b323b;
+  color:var(--tx);
+  border:1px solid var(--line);
+}
+
+.tabs button.on{
+  background:var(--acc);
+  color:#111;
+}
+
+.row{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:10px;
+  font-size:14px;
+}
+
+.row label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin:0;
+  color:var(--tx);
+}
+
+small{
+  color:var(--mu);
+  display:block;
+  margin-top:8px;
+  line-height:1.6;
+}
+
+.info{
+  background:#15181d;
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:10px;
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.7;
+  color:var(--mu);
+}
+
+.green{
+  color:var(--ok);
+}
+
+.red{
+  color:var(--danger);
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎬 مترجم الفيديو العربي</h1>
+
+
+<!-- ========================= -->
+<!-- إعداد الفيديو -->
+<!-- ========================= -->
+
+<div class="card">
+
+<label>رابط الفيديو</label>
+
+<input
+  type="url"
+  id="url"
+  dir="ltr"
+  placeholder="https://youtube.com/watch?v=..."
+>
+
+<label>أو ارفع فيديو من الهاتف</label>
+
+<input
+  type="file"
+  id="file"
+  accept="video/*,audio/*"
+>
+
+<button
+  class="sec"
+  onclick="loadVideo()">
+  📥 تحميل الفيديو
+</button>
+
+
+<label>لغة الفيديو</label>
+
+<select id="src">
+
+<option value="en">English</option>
+<option value="tr">Türkçe</option>
+<option value="fr">Français</option>
+<option value="es">Español</option>
+<option value="de">Deutsch</option>
+<option value="ru">Русский</option>
+<option value="fa">فارسی</option>
+<option value="hi">हिन्दी</option>
+<option value="ja">日本語</option>
+<option value="ko">한국어</option>
+
+</select>
+
+
+<div
+  class="tabs"
+  style="margin-top:12px">
+
+<button
+  id="t1"
+  class="on"
+  onclick="mode(1)">
+  📄 ملف ترجمة جاهز
+</button>
+
+<button
+  id="t2"
+  onclick="mode(2)">
+  🎙 استماع مباشر
+</button>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- SRT -->
+<!-- ========================= -->
+
+<div id="m1">
+
+<label>
+ملف الترجمة SRT أو VTT
+</label>
+
+<input
+  type="file"
+  id="srt"
+  accept=".srt,.vtt"
+>
+
+<button onclick="doSrt()">
+🌐 ترجمة ملف الترجمة
+</button>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- LIVE -->
+<!-- ========================= -->
+
+<div
+  id="m2"
+  style="display:none">
+
+<div class="info">
+
+🎙 <b>طريقة الاستماع المباشر</b>
+
+<br>
+
+شغّل الفيديو وارفع صوت الهاتف.
+لا تستخدم سماعة أذن أو Bluetooth أثناء الاختبار.
+
+<br>
+
+Chrome سيستخدم المايك لسماع الكلام ثم يرسله للترجمة.
+
+</div>
+
+<div class="row">
+
+<label>
+
+<input
+  type="checkbox"
+  id="live"
+  checked
+>
+
+فعّل الاستماع
+
+</label>
+
+</div>
+
+<button
+  class="sec"
+  onclick="requestMic()">
+
+🎤 اختبار / السماح بالمايك
+
+</button>
+
+</div>
+
+
+<div id="st"></div>
+
+</div>
+
+
+
+<!-- ========================= -->
+<!-- الفيديو -->
+<!-- ========================= -->
+
+<div class="card">
+
+<div class="vw">
+
+<video
+  id="v"
+  controls
+  playsinline>
+</video>
+
+<div id="ytbox">
+
+<div id="ytp"></div>
+
+</div>
+
+<div id="sub"></div>
+
+</div>
+
+
+<div class="row">
+
+<label>
+
+<input
+  type="checkbox"
+  id="dub"
+>
+
+🔊 دبلجة صوتية بالعربي
+
+</label>
+
+</div>
+
+
+<button
+  class="sec"
+  onclick="dl()">
+
+⬇ تنزيل الترجمة SRT
+
+</button>
+
+
+<small>
+الترجمة تكون بالعربية الفصحى المبسطة.
+</small>
+
+</div>
+
+
+
+<script>
+
+/* =========================================================
+   عناصر الصفحة
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+
+/* =========================================================
+   المتغيرات
+========================================================= */
+
+let segs = [];
+
+let cur = -1;
+
+let rec = null;
+
+let recRunning = false;
+
+let recWanted = false;
+
+let recRestartTimer = null;
+
+let recSession = 0;
+
+let md = 1;
+
+let voice = null;
+
+let yt = null;
+
+let ytTimer = null;
+
+let currentVideoURL = null;
+
+
+
+/* =========================================================
+   رسائل الحالة
+========================================================= */
+
+function log(message){
+
+  $("st").textContent = message;
+
+}
+
+
+
+/* =========================================================
+   أصوات العربية
+========================================================= */
+
+function pickVoice(){
+
+  try{
+
+    const voices =
+      window.speechSynthesis
+      ?
+      speechSynthesis.getVoices()
+      :
+      [];
+
+    voice =
+      voices.find(v =>
+        v.lang &&
+        v.lang.toLowerCase().startsWith("ar")
+      ) || null;
+
+  }catch(e){
+
+    voice = null;
+
+  }
+
+}
+
+
+if(window.speechSynthesis){
+
+  speechSynthesis.onvoiceschanged =
+    pickVoice;
+
+  pickVoice();
+
+}
+
+
+
+/* =========================================================
+   حالة الفيديو
+========================================================= */
+
+function isPlaying(){
+
+  if(yt){
+
+    try{
+
+      return yt.getPlayerState &&
+             yt.getPlayerState() === 1;
+
+    }catch(e){
+
+      return false;
+
+    }
+
+  }
+
+  return !$("v").paused &&
+         !$("v").ended;
+
+}
+
+
+
+/* =========================================================
+   الوقت الحالي
+========================================================= */
+
+function curTime(){
+
+  if(yt){
+
+    try{
+
+      return yt.getCurrentTime
+        ? yt.getCurrentTime()
+        : 0;
+
+    }catch(e){
+
+      return 0;
+
+    }
+
+  }
+
+  return $("v").currentTime || 0;
+
+}
+
+
+
+/* =========================================================
+   تبديل الوضع
+========================================================= */
+
+function mode(n){
+
+  md = n;
+
+  $("m1").style.display =
+    n === 1 ? "block" : "none";
+
+  $("m2").style.display =
+    n === 2 ? "block" : "none";
+
+  $("t1").className =
+    n === 1 ? "on" : "";
+
+  $("t2").className =
+    n === 2 ? "on" : "";
+
+
+  segs = [];
+
+  cur = -1;
+
+  $("sub").textContent = "";
+
+
+  stopRec();
+
+
+  if(
+    n === 2 &&
+    $("live").checked &&
+    isPlaying()
+  ){
+
+    startRec();
+
+  }
+
+}
+
+
+
+/* =========================================================
+   استخراج ID من يوتيوب
+========================================================= */
+
+function ytId(url){
+
+  if(!url) return null;
+
+  const patterns = [
+
+    /youtu\.be\/([\w-]{11})/,
+
+    /[?&]v=([\w-]{11})/,
+
+    /youtube\.com\/shorts\/([\w-]{11})/,
+
+    /youtube\.com\/embed\/([\w-]{11})/,
+
+    /youtube\.com\/live\/([\w-]{11})/
+
+  ];
+
+  for(const p of patterns){
+
+    const m = url.match(p);
+
+    if(m) return m[1];
+
+  }
+
+  return null;
+
+}
+
+
+
+/* =========================================================
+   تشغيل يوتيوب
+========================================================= */
+
+function loadYT(id){
+
+  $("v").style.display = "none";
+
+  $("ytbox").style.display = "block";
+
+
+  const make = () => {
+
+    if(yt){
+
+      try{
+
+        yt.loadVideoById(id);
+
+      }catch(e){}
+
+      return;
+
+    }
+
+
+    yt = new YT.Player(
+      "ytp",
+      {
+
+        videoId:id,
+
+        playerVars:{
+          playsinline:1,
+          rel:0,
+          modestbranding:1
+        },
+
+        events:{
+
+          onReady:()=>{
+
+            log("✅ يوتيوب جاهز");
+
+          },
+
+
+          onStateChange:e=>{
+
+            if(e.data === 1){
+
+              if(
+                md === 2 &&
+                $("live").checked
+              ){
+
+                startRec();
+
+              }
+
+            }
+
+            else{
+
+              stopRec();
+
+              if(window.speechSynthesis){
+
+                speechSynthesis.cancel();
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+    );
+
+  };
+
+
+  if(
+    window.YT &&
+    YT.Player
+  ){
+
+    make();
+
+  }
+
+  else{
+
+    window.onYouTubeIframeAPIReady =
+      make;
+
+    const script =
+      document.createElement("script");
+
+    script.src =
+      "https://www.youtube.com/iframe_api";
+
+    script.onerror = () => {
+
+      log(
+        "❌ تعذر تحميل مشغل يوتيوب"
+      );
+
+    };
+
+    document.head.appendChild(script);
+
+  }
+
+}
+
+
+
+/* =========================================================
+   تحميل الفيديو
+========================================================= */
+
+function loadVideo(){
+
+  stopRec();
+
+  cur = -1;
+
+  $("sub").textContent = "";
+
+
+  const file =
+    $("file").files[0];
+
+
+  if(file){
+
+    if(yt){
+
+      try{
+
+        yt.stopVideo();
+
+      }catch(e){}
+
+      yt = null;
+
+    }
+
+
+    $("ytbox").style.display =
+      "none";
+
+    $("v").style.display =
+      "block";
+
+
+    if(currentVideoURL){
+
+      try{
+
+        URL.revokeObjectURL(
+          currentVideoURL
+        );
+
+      }catch(e){}
+
+    }
+
+
+    currentVideoURL =
+      URL.createObjectURL(file);
+
+
+    $("v").src =
+      currentVideoURL;
+
+
+    $("v").load();
+
+
+    log(
+      "✅ تم تحميل الفيديو"
+    );
+
+    return;
+
+  }
+
+
+  const url =
+    $("url").value.trim();
+
+
+  if(!url){
+
+    log(
+      "❌ أدخل رابط فيديو أو ارفع ملف"
+    );
+
+    return;
+
+  }
+
+
+  const id =
+    ytId(url);
+
+
+  if(id){
+
+    loadYT(id);
+
+    log(
+      "✅ تم تحميل فيديو يوتيوب"
+    );
+
+    return;
+
+  }
+
+
+  if(yt){
+
+    try{
+
+      yt.stopVideo();
+
+    }catch(e){}
+
+    yt = null;
+
+  }
+
+
+  $("ytbox").style.display =
+    "none";
+
+  $("v").style.display =
+    "block";
+
+  $("v").src =
+    url;
+
+  $("v").load();
+
+  log(
+    "✅ تم تحميل الفيديو"
+  );
+
+}
+
+
+
+/* =========================================================
+   ترجمة MyMemory
+========================================================= */
+
+async function tr(text){
+
+  if(!text || !text.trim()){
+
+    return "";
+
+  }
+
+
+  const clean =
+    text.trim().slice(0,480);
+
+
+  const lang =
+    $("src").value;
+
+
+  const api =
+    "https://api.mymemory.translated.net/get" +
+    "?q=" +
+    encodeURIComponent(clean) +
+    "&langpair=" +
+    encodeURIComponent(lang + "|ar");
+
+
+  const response =
+    await fetch(api);
+
+
+  if(!response.ok){
+
+    throw new Error(
+      "تعذر الاتصال بخدمة الترجمة"
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if(
+    data.responseStatus &&
+    data.responseStatus != 200
+  ){
+
+    throw new Error(
+      data.responseDetails ||
+      "خطأ في خدمة الترجمة"
+    );
+
+  }
+
+
+  return (
+    data.responseData &&
+    data.responseData.translatedText
+  ) || "";
+
+}
+
+
+
+/* =========================================================
+   تحويل الوقت
+========================================================= */
+
+function toSec(h,m,s,ms){
+
+  h = Number(h || 0);
+
+  m = Number(m || 0);
+
+  s = Number(s || 0);
+
+  ms = String(ms || "0");
+
+  ms =
+    Number(
+      ms.padEnd(3,"0").slice(0,3)
+    );
+
+
+  return (
+    h * 3600 +
+    m * 60 +
+    s +
+    ms / 1000
+  );
+
+}
+
+
+
+/* =========================================================
+   قراءة SRT / VTT
+========================================================= */
+
+function parseSub(txt){
+
+  const out = [];
+
+
+  txt =
+    txt
+    .replace(/\r/g,"")
+    .replace(/^\uFEFF/,"");
+
+
+  const blocks =
+    txt.split(/\n\s*\n+/);
+
+
+  for(const block of blocks){
+
+    const time =
+      block.match(
+        /(?:(\d+):)?(\d+):(\d+)[,.](\d+)\s*-->\s*(?:(\d+):)?(\d+):(\d+)[,.](\d+)/
+      );
+
+
+    if(!time) continue;
+
+
+    const lines =
+      block.split("\n");
+
+
+    const index =
+      lines.findIndex(
+        line =>
+          line.includes("-->")
+      );
+
+
+    if(index < 0) continue;
+
+
+    const original =
+      lines
+      .slice(index + 1)
+      .join(" ")
+      .replace(/<[^>]+>/g,"")
+      .trim();
+
+
+    if(!original) continue;
+
+
+    out.push({
+
+      s:toSec(
+        time[1],
+        time[2],
+        time[3],
+        time[4]
+      ),
+
+      e:toSec(
+        time[5],
+        time[6],
+        time[7],
+        time[8]
+      ),
+
+      o:original
+
+    });
+
+  }
+
+
+  return out;
+
+}
+
+
+
+/* =========================================================
+   ترجمة SRT
+========================================================= */
+
+async function doSrt(){
+
+  const file =
+    $("srt").files[0];
+
+
+  if(!file){
+
+    log(
+      "❌ اختار ملف SRT أو VTT أولاً"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    log(
+      "📖 قراءة ملف الترجمة..."
+    );
+
+
+    const text =
+      await file.text();
+
+
+    segs =
+      parseSub(text);
+
+
+    if(!segs.length){
+
+      log(
+        "❌ الملف غير مفهوم"
+      );
+
+      return;
+
+    }
+
+
+    for(
+      let i = 0;
+      i < segs.length;
+      i++
+    ){
+
+      log(
+        "🌐 جاري الترجمة " +
+        (i + 1) +
+        " / " +
+        segs.length
+      );
+
+
+      segs[i].a =
+        await tr(segs[i].o);
+
+
+      /*
+        تأخير بسيط حتى لا نرسل
+        طلبات بسرعة كبيرة
+      */
+
+      await sleep(120);
+
+    }
+
+
+    log(
+      "✅ خلصت الترجمة. شغّل الفيديو."
+    );
+
+
+  }catch(e){
+
+    log(
+      "❌ " +
+      e.message +
+      " - يمكن خدمة الترجمة وصلت حدها"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   تأخير
+========================================================= */
+
+function sleep(ms){
+
+  return new Promise(
+    resolve =>
+      setTimeout(resolve,ms)
+  );
+
+}
+
+
+
+/* =========================================================
+   تحديث الترجمة على الفيديو
+========================================================= */
+
+function tick(){
+
+  if(md !== 1) return;
+
+
+  const t =
+    curTime();
+
+
+  const index =
+    segs.findIndex(
+      s =>
+        s.a &&
+        t >= s.s &&
+        t < s.e
+    );
+
+
+  if(index === cur) return;
+
+
+  cur = index;
+
+
+  show(
+    index >= 0
+      ? segs[index].a
+      : ""
+  );
+
+}
+
+
+
+/* =========================================================
+   عرض الترجمة
+========================================================= */
+
+function show(text){
+
+  $("sub").textContent =
+    text || "";
+
+
+  if(
+    window.speechSynthesis
+  ){
+
+    speechSynthesis.cancel();
+
+  }
+
+
+  if(
+    text &&
+    $("dub").checked &&
+    window.SpeechSynthesisUtterance
+  ){
+
+    try{
+
+      const utter =
+        new SpeechSynthesisUtterance(
+          text
+        );
+
+
+      utter.lang =
+        "ar-SA";
+
+
+      if(voice){
+
+        utter.voice =
+          voice;
+
+      }
+
+
+      utter.rate =
+        0.95;
+
+
+      speechSynthesis.speak(
+        utter
+      );
+
+    }catch(e){}
+
+  }
+
+}
+
+
+
+/* =========================================================
+   تحديث الفيديو العادي
+========================================================= */
+
+$("v").addEventListener(
+  "timeupdate",
+  ()=>{
+
+    if(!yt){
+
+      tick();
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   تشغيل الفيديو
+========================================================= */
+
+$("v").addEventListener(
+  "play",
+  ()=>{
+
+    if(
+      md === 2 &&
+      $("live").checked
+    ){
+
+      startRec();
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   إيقاف الفيديو
+========================================================= */
+
+$("v").addEventListener(
+  "pause",
+  ()=>{
+
+    stopRec();
+
+
+    if(
+      window.speechSynthesis
+    ){
+
+      speechSynthesis.cancel();
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   checkbox الاستماع
+========================================================= */
+
+$("live").addEventListener(
+  "change",
+  ()=>{
+
+    if($("live").checked){
+
+      if(
+        md === 2 &&
+        isPlaying()
+      ){
+
+        startRec();
+
+      }
+
+    }
+
+    else{
+
+      stopRec();
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   الدبلجة
+========================================================= */
+
+$("dub").addEventListener(
+  "change",
+  ()=>{
+
+    const enabled =
+      $("dub").checked;
+
+
+    if(yt && yt.setVolume){
+
+      try{
+
+        yt.setVolume(
+          enabled ? 25 : 100
+        );
+
+      }catch(e){}
+
+    }
+
+    else{
+
+      $("v").volume =
+        enabled ? 0.25 : 1;
+
+    }
+
+
+    if(!enabled){
+
+      if(
+        window.speechSynthesis
+      ){
+
+        speechSynthesis.cancel();
+
+      }
+
+    }
+
+  }
+);
+
+
+
+/* =========================================================
+   طلب إذن المايك
+========================================================= */
+
+async function requestMic(){
+
+  if(
+    !window.isSecureContext
+  ){
+
+    log(
+      "❌ الموقع لازم يفتح برابط HTTPS"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
+
+    log(
+      "❌ جهازك لا يدعم الوصول للمايك من هذا المتصفح"
+    );
+
+    return;
+
+  }
+
+
+  try{
+
+    log(
+      "🎤 جاري طلب صلاحية المايك..."
+    );
+
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:true
+      });
+
+
+    stream
+      .getTracks()
+      .forEach(
+        track =>
+          track.stop()
+      );
+
+
+    log(
+      "✅ المايك مسموح. شغّل الفيديو."
+    );
+
+
+  }catch(e){
+
+    console.log(e);
+
+
+    log(
+      "❌ تم رفض المايك أو لم يتم السماح به"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   الاستماع المباشر
+========================================================= */
+
+async function startRec(){
+
+  const SR =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if(!SR){
+
+    log(
+      "❌ Chrome لا يدعم التعرف على الكلام بهذا الجهاز"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !isPlaying()
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !$("live").checked
+  ){
+
+    return;
+
+  }
+
+
+  /*
+    نريد الاستماع
+  */
+
+  recWanted = true;
+
+
+  /*
+    إلغاء إعادة تشغيل قديمة
+  */
+
+  if(recRestartTimer){
+
+    clearTimeout(
+      recRestartTimer
+    );
+
+    recRestartTimer = null;
+
+  }
+
+
+  /*
+    لا تبدأ جلسة ثانية
+  */
+
+  if(recRunning){
+
+    return;
+
+  }
+
+
+  const session =
+    ++recSession;
+
+
+  /*
+    طلب إذن المايك
+  */
+
+  try{
+
+    if(
+      navigator.mediaDevices &&
+      navigator.mediaDevices.getUserMedia
+    ){
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio:true
+        });
+
+
+      stream
+        .getTracks()
+        .forEach(
+          track =>
+            track.stop()
+        );
+
+    }
+
+  }catch(e){
+
+    recWanted = false;
+
+
+    log(
+      "❌ اسمح للمايك من إعدادات Chrome"
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    إذا المستخدم أوقف العملية
+    أثناء طلب المايك
+  */
+
+  if(
+    session !== recSession ||
+    !recWanted ||
+    !$("live").checked ||
+    !isPlaying()
+  ){
+
+    return;
+
+  }
+
+
+  try{
+
+    const r =
+      new SR();
+
+
+    rec = r;
+
+
+    const lang =
+      $("src").value;
+
+
+    const languageMap = {
+
+      en:"en-US",
+
+      tr:"tr-TR",
+
+      fr:"fr-FR",
+
+      es:"es-ES",
+
+      de:"de-DE",
+
+      ru:"ru-RU",
+
+      fa:"fa-IR",
+
+      hi:"hi-IN",
+
+      ja:"ja-JP",
+
+      ko:"ko-KR"
+
+    };
+
+
+    r.lang =
+      languageMap[lang] ||
+      lang;
+
+
+    /*
+      مهم جداً على Android:
+      لا نستخدم continuous=true
+      لأن Chrome ممكن يعطي aborted.
+    */
+
+    r.continuous = false;
+
+    r.interimResults = false;
+
+    r.maxAlternatives = 1;
+
+
+    recRunning = true;
+
+
+    r.onstart = ()=>{
+
+      log(
+        "🎙 جاري الاستماع..."
+      );
+
+    };
+
+
+    r.onresult = async event =>{
+
+      try{
+
+        const result =
+          event.results[
+            event.results.length - 1
+          ];
+
+
+        if(
+          !result ||
+          !result[0]
+        ){
+
+          return;
+
+        }
+
+
+        const original =
+          result[0]
+          .transcript
+          .trim();
+
+
+        if(!original){
+
+          return;
+
+        }
+
+
+        const now =
+          curTime();
+
+
+        log(
+          "🌐 جاري ترجمة الكلام..."
+        );
+
+
+        try{
+
+          const arabic =
+            await tr(
+              original
+            );
+
+
+          if(arabic){
+
+            segs.push({
+
+              s:Math.max(
+                0,
+                now - 4
+              ),
+
+              e:now + 1,
+
+              o:original,
+
+              a:arabic
+
+            });
+
+
+            show(
+              arabic
+            );
+
+
+            log(
+              "🎙 " +
+              original +
+              " → " +
+              arabic
+            );
+
+          }
+
+        }catch(error){
+
+          log(
+            "❌ خطأ بالترجمة: " +
+            error.message
+          );
+
+        }
+
+      }catch(error){
+
+        console.log(
+          "Result error:",
+          error
+        );
+
+      }
+
+    };
+
+
+    r.onerror = event =>{
+
+      const error =
+        event.error ||
+        "unknown";
+
+
+      console.log(
+        "SpeechRecognition:",
+        error
+      );
+
+
+      if(
+        error === "aborted"
+      ){
+
+        log(
+          "🎙 إعادة تشغيل الاستماع..."
+        );
+
+      }
+
+      else if(
+        error === "no-speech"
+      ){
+
+        log(
+          "🎙 لم أسمع كلاماً، أحاول مرة ثانية..."
+        );
+
+      }
+
+      else if(
+        error === "audio-capture"
+      ){
+
+        log(
+          "❌ تعذر الوصول إلى المايك"
+        );
+
+      }
+
+      else if(
+        error === "not-allowed"
+      ){
+
+        recWanted = false;
+
+        log(
+          "❌ المايك غير مسموح"
+        );
+
+      }
+
+      else if(
+        error === "network"
+      ){
+
+        log(
+          "❌ مشكلة في اتصال التعرف على الكلام"
+        );
+
+      }
+
+      else{
+
+        log(
+          "❌ " + error
+        );
+
+      }
+
+    };
+
+
+    r.onend = ()=>{
+
+      recRunning = false;
+
+
+      /*
+        إذا المستخدم أوقف الاستماع
+      */
+
+      if(!recWanted){
+
+        return;
+
+      }
+
+
+      /*
+        إذا الفيديو توقف
+      */
+
+      if(!isPlaying()){
+
+        return;
+
+      }
+
+
+      /*
+        checkbox غير فعال
+      */
+
+      if(!$("live").checked){
+
+        return;
+
+      }
+
+
+      /*
+        إعادة التشغيل بعد تأخير
+      */
+
+      recRestartTimer =
+        setTimeout(
+          ()=>{
+
+            recRestartTimer = null;
+
+
+            if(
+              recWanted &&
+              $("live").checked &&
+              isPlaying()
+            ){
+
+              startRec();
+
+            }
+
+          },
+          800
+        );
+
+    };
+
+
+    /*
+      بدء التعرف
+    */
+
+    r.start();
+
+
+  }catch(error){
+
+    console.log(
+      "Recognition start error:",
+      error
+    );
+
+
+    recRunning = false;
+
+
+    /*
+      إعادة المحاولة بعد فترة
+    */
+
+    recRestartTimer =
+      setTimeout(
+        ()=>{
+
+          recRestartTimer = null;
+
+
+          if(
+            recWanted &&
+            $("live").checked &&
+            isPlaying()
+          ){
+
+            startRec();
+
+          }
+
+        },
+        1500
+      );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   إيقاف الاستماع
+========================================================= */
+
+function stopRec(){
+
+  recWanted = false;
+
+
+  recSession++;
+
+
+  if(recRestartTimer){
+
+    clearTimeout(
+      recRestartTimer
+    );
+
+    recRestartTimer = null;
+
+  }
+
+
+  recRunning = false;
+
+
+  if(rec){
+
+    const old =
+      rec;
+
+
+    rec = null;
+
+
+    try{
+
+      old.onend = null;
+
+      old.onerror = null;
+
+      old.onresult = null;
+
+      old.stop();
+
+    }catch(e){}
+
+  }
+
+}
+
+
+
+/* =========================================================
+   تنسيق الوقت SRT
+========================================================= */
+
+function ts(seconds){
+
+  seconds =
+    Math.max(
+      0,
+      Number(seconds || 0)
+    );
+
+
+  const h =
+    Math.floor(
+      seconds / 3600
+    );
+
+
+  const m =
+    Math.floor(
+      (seconds % 3600) / 60
+    );
+
+
+  const s =
+    Math.floor(
+      seconds % 60
+    );
+
+
+  const ms =
+    Math.floor(
+      (seconds % 1) * 1000
+    );
+
+
+  const pad =
+    (n,len=2)=>
+      String(n)
+      .padStart(len,"0");
+
+
+  return (
+
+    pad(h) +
+    ":" +
+    pad(m) +
+    ":" +
+    pad(s) +
+    "," +
+    pad(ms,3)
+
+  );
+
+}
+
+
+
+/* =========================================================
+   تنزيل SRT
+========================================================= */
+
+function dl(){
+
+  const data =
+    segs.filter(
+      s =>
+        s.a
+    );
+
+
+  if(!data.length){
+
+    log(
+      "❌ ماكو ترجمة للتنزيل"
+    );
+
+    return;
+
+  }
+
+
+  const srt =
+    data
+    .map(
+      (s,i)=>
+        (
+          (i + 1) +
+          "\n" +
+          ts(s.s) +
+          " --> " +
+          ts(s.e) +
+          "\n" +
+          s.a +
+          "\n"
+        )
+    )
+    .join("\n");
+
+
+  const blob =
+    new Blob(
+      [srt],
+      {
+        type:
+          "text/plain;charset=utf-8"
+      }
+    );
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const a =
+    document.createElement("a");
+
+
+  a.href =
+    url;
+
+
+  a.download =
+    "arabic-subtitles.srt";
+
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+
+  setTimeout(
+    ()=>{
+      URL.revokeObjectURL(url);
+    },
+    1000
+  );
+
+
+  log(
+    "✅ تم تنزيل ملف SRT"
+  );
+
+}
+
+
+
+/* =========================================================
+   تحديث يوتيوب
+========================================================= */
+
+setInterval(
+  ()=>{
+
+    if(
+      yt &&
+      md === 1
+    ){
+
+      tick();
+
+    }
+
+  },
+  250
+);
+
+
+
+/* =========================================================
+   منع مشاكل speechSynthesis
+========================================================= */
+
+if(
+  !window.speechSynthesis
+){
+
+  window.speechSynthesis = {
+
+    getVoices(){
+      return [];
+    },
+
+    cancel(){},
+
+    speak(){},
+
+    onvoiceschanged:null
+
+  };
+
+}
+
+
+</script>
+
+</body>
+</html>
